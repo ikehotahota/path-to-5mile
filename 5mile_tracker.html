@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Path to 5mile</title>
+<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F4FB; --ink:#2A2440; --sub:#8A83A5; --card:#FFFFFF;
+  --violet:#7C6BC4; --violet-soft:#EDE9F9;
+  --ums:#2E8B84; --ums-soft:#E2F1EF;
+  --rkt:#E0704A; --rkt-soft:#FBEAE2;
+  --win:#C9A227; --win-soft:#FBF3DA;
+  --line:#E5E1F0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"M PLUS Rounded 1c",sans-serif;background:var(--bg);color:var(--ink);padding-bottom:90px}
+header{background:var(--violet);color:#fff;padding:18px 16px 14px;border-radius:0 0 20px 20px}
+header h1{font-family:"Mochiy Pop One",sans-serif;font-size:20px;font-weight:400;letter-spacing:.03em}
+header .sub{font-size:13px;opacity:.85;margin-top:2px}
+.money{display:flex;gap:10px;margin-top:12px}
+.stickybar{position:sticky;top:0;z-index:20;background:var(--violet);padding:8px 16px 10px;border-radius:0 0 16px 16px}
+.stickybar .money{margin-top:0}
+.money div{flex:1;background:rgba(255,255,255,.14);border-radius:12px;padding:8px 8px;min-width:0}
+.money .lbl{font-size:11px;opacity:.9}
+.money .val{font-family:"Mochiy Pop One",sans-serif;font-size:17px;font-weight:400;margin-top:2px;white-space:nowrap}
+nav{display:flex;gap:4px;padding:10px 16px 6px;position:sticky;top:74px;background:var(--bg);z-index:19}
+nav button{flex:1;border:none;background:#fff;border:1.5px solid var(--line);color:var(--sub);font-family:inherit;font-weight:700;font-size:14px;padding:9px 2px;border-radius:999px;cursor:pointer}
+nav button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+main{padding:10px 16px}
+.hint{font-size:13px;color:var(--sub);margin:4px 2px 10px}
+.tix{position:relative;background:var(--card);border-radius:14px;margin-bottom:12px;padding:12px 14px 12px 22px;box-shadow:0 1px 4px rgba(42,36,64,.07);overflow:hidden}
+.tix::before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;background:var(--edge,var(--violet))}
+.tix::after{content:"";position:absolute;left:4px;top:50%;width:12px;height:12px;border-radius:50%;background:var(--bg);transform:translate(-50%,-50%)}
+.tix.ums{--edge:var(--ums)} .tix.rkt{--edge:var(--rkt)}
+.row1{display:flex;align-items:center;gap:8px}
+.row1 .name{font-family:"Mochiy Pop One",sans-serif;font-weight:400;font-size:17px;flex:1}
+.badge{font-size:13px;font-weight:700;padding:3px 8px;border-radius:999px}
+.badge.ums{background:var(--ums-soft);color:var(--ums)}
+.badge.rkt{background:var(--rkt-soft);color:var(--rkt)}
+.period{font-size:16px;font-weight:700;color:#5A5378;margin-top:3px}
+.heldat{font-size:15px;color:var(--sub);margin-top:2px}
+.applybtn{width:100%;margin-top:10px;font-family:inherit;font-size:16px;font-weight:700;padding:9px 0;border-radius:10px;border:1.5px dashed var(--violet);background:#fff;color:var(--violet);cursor:pointer}
+.applybtn.on{border-style:solid;background:var(--violet-soft)}
+.counts{margin-top:10px;border-top:1.5px dashed var(--line);padding-top:9px}
+.counts .cap{font-size:15px;font-weight:700;color:var(--sub);margin-bottom:5px}
+.crow{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.crow .ed{font-size:17px;flex:1}
+.crow .price{font-size:15px;color:var(--sub)}
+.step{display:flex;align-items:center;gap:0;border:1.5px solid var(--line);border-radius:8px;overflow:hidden}
+.step button{width:42px;height:38px;border:none;background:#fff;font-size:22px;font-weight:700;color:var(--violet);cursor:pointer;font-family:inherit}
+.step span{width:48px;text-align:center;font-size:20px;font-weight:900}
+.amt{text-align:right;font-size:18px;font-weight:900;margin-top:4px}
+.amt small{font-weight:500;color:var(--sub);font-size:14px;margin-right:4px}
+.winbox{margin-top:10px;background:var(--win-soft);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px}
+.winbox .wl{flex:1;font-size:16px;font-weight:700;color:#8a6d0d}
+.winbox .step button{color:#8a6d0d}
+.winbtn{width:100%;margin-top:10px;font-family:inherit;font-size:18px;font-weight:900;padding:12px 0;border-radius:12px;border:2px solid var(--win);background:var(--win-soft);color:#8a6d0d;cursor:pointer}
+.winbtn:active{transform:scale(.97)}
+.day{display:flex;gap:10px;margin-bottom:10px;align-items:stretch}
+.day .date{width:72px;flex-shrink:0;text-align:center;background:#fff;border-radius:12px;padding:8px 0;border:1.5px solid var(--line)}
+.day .date .d{font-size:18px;font-weight:900}
+.day .date .w{font-size:13px;color:var(--sub)}
+.day .body{flex:1;background:#fff;border-radius:12px;padding:9px 12px;border-left:5px solid var(--edge,var(--violet))}
+.day.ums .body{--edge:var(--ums)} .day.rkt .body{--edge:var(--rkt)} .day.mile .body{--edge:var(--win)}
+.day .t{font-size:16px;font-weight:700}
+.day .cd{font-size:13px;color:var(--sub);margin-top:1px}
+.day .cd b{color:var(--rkt)}
+.day.done{opacity:.45}
+.day.done .t{text-decoration:line-through}
+.sumcard{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(42,36,64,.07)}
+.sumcard h3{font-size:16px;margin-bottom:8px}
+.srow{display:flex;justify-content:space-between;font-size:16px;padding:5px 0;border-bottom:1px solid var(--line)}
+.srow:last-child{border:none}
+.srow b{font-weight:900}
+.prices input{width:96px;font-family:inherit;font-size:16px;font-weight:700;padding:5px 8px;border:1.5px solid var(--line);border-radius:8px;text-align:right}
+.octo{text-align:center;font-size:14px;color:var(--sub);margin:18px 0 6px}
+.reset{display:block;margin:10px auto 0;background:none;border:none;color:var(--sub);font-size:13px;font-family:inherit;text-decoration:underline;cursor:pointer}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:14px;font-weight:700;padding:9px 18px;border-radius:999px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:50}
+.toast.show{opacity:1}
+.loading{text-align:center;padding:50px 0;color:var(--sub);font-size:16px}
+</style>
+</head>
+<body>
+<header style="padding-bottom:8px;border-radius:0">
+  <h1>🐙 Path to 5mile</h1>
+  <div class="sub">OCTPATH 3rd album イベント計算表</div>
+</header>
+<div class="stickybar">
+  <div class="money">
+    <div><div class="lbl">予定(未購入)</div><div class="val" id="mPlan">—</div></div>
+    <div><div class="lbl">確定(購入済)</div><div class="val" id="mConf">—</div></div>
+    <div><div class="lbl">見込み総額</div><div class="val" id="mTotal">—</div></div>
+  </div>
+</div>
+<nav>
+  <button id="tab0" class="on">申込</button>
+  <button id="tab1">予定表</button>
+  <button id="tab2">集計</button>
+  <button id="tab3">当日</button>
+  <button id="tab4">リンク</button>
+</nav>
+<main id="main"><div class="loading">読み込み中だすみ…🐙</div></main>
+<div class="toast" id="toast"></div>
+<script>
+const KEY="5mile-ledger-v1";
+const store={
+  async get(k){
+    if(window.storage){return await window.storage.get(k);}
+    try{const v=localStorage.getItem(k);return v?{value:v}:null;}catch(e){return null;}
+  },
+  async set(k,v){
+    if(window.storage){return await window.storage.set(k,v);}
+    try{localStorage.setItem(k,v);return {ok:1};}catch(e){return null;}
+  }
+};
+const EDITIONS=[["f","フラッシュ盤"],["i","初回限定盤"],["c","FC盤"]];
+const RESULTS={
+  sign1:{d:"2026-09-11",t:"9/11(金)15:00以降"},
+  sign2:{d:"2026-09-19",t:"9/19(土)15:00以降"},
+  cardsign:{d:"2026-09-15",t:"9/15(火)15:00以降"},
+  gs1:{d:"2026-09-29",t:"9/29(火)15:00以降"},
+  gs2:{d:"2026-10-07",t:"10/7(水)15:00以降"},
+  gs3:{d:"2026-10-15",t:"10/15(木)15:00以降"},
+  bs1:{d:"2026-10-23",t:"10/23(金)15:00以降"},
+  bs2:{d:"2026-11-02",t:"11/2(月)15:00以降"},
+  xmas1:{d:"2026-09-18",t:"9/18(金)夕方頃"},
+  xmas2:{d:"2026-09-30",t:"9/30(水)夕方頃"},
+  papa:{d:"2026-10-09",t:"10/9(金)夕方頃"},
+  aku1:{d:"2026-10-19",t:"10/19(月)夕方頃"},
+  aku2:{d:"2026-10-28",t:"10/28(水)夕方頃"}
+};
+const TARGETS={
+  online:["f"],sign1:["f"],sign2:["f"],cardsign:["c"],
+  gs1:["i"],gs2:["i"],gs3:["i"],bs1:["f"],bs2:["f"],
+  aku1:["f","i"],aku2:["f","i"],papa:["f","i"],xmas1:["f","i"],xmas2:["f","i"]
+};
+const TNOTES={
+  online:"対象:フラッシュ盤(専用ページ) 1枚=1口",
+  sign1:"対象:フラッシュ盤2枚セット=1口",
+  sign2:"対象:フラッシュ盤2枚セット=1口",
+  cardsign:"対象:FC限定盤 1セット=1口",
+  gs1:"対象:初回限定盤(FC専用ページ)",
+  gs2:"対象:初回限定盤(FC専用ページ)",
+  gs3:"対象:初回限定盤(FC専用ページ)",
+  bs1:"対象:フラッシュ盤(FC会員限定・1枚=1口)",
+  bs2:"対象:フラッシュ盤(FC会員限定・1枚=1口)",
+  aku1:"対象:フラッシュ盤 or 初回限定盤(1枚=1口・クレカ限定)",
+  aku2:"対象:フラッシュ盤 or 初回限定盤(1枚=1口・クレカ限定)",
+  xmas1:"対象:フラッシュ盤 or 初回限定盤(楽天・クレカ限定)",
+  xmas2:"対象:フラッシュ盤 or 初回限定盤(楽天・クレカ限定)",
+  papa:"対象:フラッシュ盤 or 初回限定盤(1枚=1口・当選は1人1回)"
+};
+function editionsFor(ev){
+  const t=TARGETS[ev.id];
+  return EDITIONS.filter(([k])=>{
+    if(ev.plan[k]||ev.conf[k])return true;      // 入力済みは常に表示
+    if(t)return t.includes(k);                   // 対象盤が判明→それだけ
+    if(k==="c"&&!state.prices.c)return false;    // FC盤は単価未設定なら隠す
+    return true;
+  });
+}
+const DEFAULT={
+  prices:{f:2420,i:6050,c:6980},
+  events:[
+    {id:"online",name:"個別オンライン",part:"ー",period:"申込終了※購入した人は記録してね(当選口も)",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-11-01",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"sign1",name:"個別サイン会",part:"1部",period:"9/3-9/5",deadline:"2026-09-05",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"cardsign",name:"カードサイン会",part:"ー",period:"8/31-9/7",deadline:"2026-09-07",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"sign2",name:"個別サイン会",part:"2部",period:"9/11-9/13",deadline:"2026-09-13",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"xmas1",name:"クリスマスカード会",part:"1部",period:"9/11-9/13",deadline:"2026-09-13",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"gs1",name:"プレミアムグループサイン会",part:"1部",period:"9/19-9/21",deadline:"2026-09-21",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"xmas2",name:"クリスマスカード会",part:"2部",period:"9/18-9/23",deadline:"2026-09-23",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"gs2",name:"プレミアムグループサイン会",part:"2部",period:"9/29-10/1",deadline:"2026-10-01",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"papa",name:"パパラッチ会",part:"ー",period:"9/30-10/4",deadline:"2026-10-04",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"gs3",name:"プレミアムグループサイン会",part:"3部",period:"10/7-10/9",deadline:"2026-10-09",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"aku1",name:"個別握手会",part:"1部",period:"10/9-10/12",deadline:"2026-10-12",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"bs1",name:"Best Shot会",part:"1部",period:"10/15-10/17",deadline:"2026-10-17",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"aku2",name:"個別握手会",part:"2部",period:"10/19-10/21",deadline:"2026-10-21",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {id:"bs2",name:"Best Shot会",part:"2部",period:"10/23-10/25",deadline:"2026-10-25",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}}
+  ]
+};
+const NOTICE={date:"2026-12-18",label:"📩 参加通知ご案内予定(12/26イベント分)"};
+const MILES=[
+  {date:"2026-10-23",label:"💻 個別オンライン参加券 受取開始 18:00〜"},
+  {date:"2026-10-31",label:"💻 個別オンライン参加券 受取期限 23:59まで"},
+  {date:"2026-11-13",label:"📩 カードサイン会 参加通知ご案内予定 15:00以降"},
+  {date:"2026-11-18",label:"💿『5mile』発売日"},
+  {date:"2026-11-19",label:"🎂 5周年ライブ＆カードサイン会＠立川"},
+  {date:"2026-12-26",label:"🗣️ 発売記念イベント＠TOC有明"}
+];
+let state=null,tab=0;
+const yen=n=>"¥"+n.toLocaleString("ja-JP");
+const UNITS={sign1:{f:2},sign2:{f:2}};  // 1口あたりの枚数(2枚セット等)
+const unitOf=(ev,k)=>(UNITS[ev.id]&&UNITS[ev.id][k])||1;
+const amountEv=(ev,cnt)=>["f","i","c"].reduce((s,k)=>s+cnt[k]*(state.prices[k]||0)*unitOf(ev,k),0);
+const sheetsEv=(ev,cnt)=>["f","i","c"].reduce((s,k)=>s+cnt[k]*unitOf(ev,k),0);
+
+async function load(){
+  try{
+    const r=await store.get(KEY);
+    if(r&&r.value){state=JSON.parse(r.value);}
+  }catch(e){/* first run */}
+  if(!state)state=JSON.parse(JSON.stringify(DEFAULT));
+  // migrate from old status-based format
+  state.events.forEach(e=>{
+    if(e.applied===undefined)e.applied=(e.status==="applied"||e.status==="won"||e.status==="lost");
+    if(e.wins===undefined)e.wins=(e.status==="won"?1:0);
+    delete e.status;
+  });
+  DEFAULT.events.forEach((de,i)=>{
+    if(!state.events.find(e=>e.id===de.id)){
+      state.events.splice(Math.min(i,state.events.length),0,JSON.parse(JSON.stringify(de)));
+    }
+  });
+  state.events.forEach(e=>{if(e.name==="グループサイン会")e.name="プレミアムグループサイン会";});
+  const on=state.events.find(e=>e.id==="online");
+  if(on&&!on.eventDate)on.eventDate="2026-11-01";
+  if(on)on.period="申込終了※購入した人は記録してね(当選口も)";
+  if(!state.prices.c)state.prices.c=6980;
+  render();
+}
+let saveTimer=null,warned=false;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    try{
+      const r=await store.set(KEY,JSON.stringify(state));
+      if(!r)warnOnce();
+    }catch(e){warnOnce();}
+  },400);
+}
+function warnOnce(){
+  if(warned)return;warned=true;
+  toast("この画面は自動保存が効かないみたい。集計タブのバックアップを使ってね🐙");
+}
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),1800);
+}
+function header(){
+  let plan=0,conf=0;
+  state.events.forEach(e=>{
+    if(e.applied)conf+=amountEv(e,e.conf);
+    else plan+=amountEv(e,e.plan);
+  });
+  document.getElementById("mPlan").textContent=yen(plan);
+  document.getElementById("mConf").textContent=yen(conf);
+  document.getElementById("mTotal").textContent=yen(plan+conf);
+}
+function stepper(val,cb){
+  const w=document.createElement("div");w.className="step";
+  const m=document.createElement("button");m.textContent="−";m.setAttribute("aria-label","減らす");
+  const s=document.createElement("span");s.textContent=val;
+  const p=document.createElement("button");p.textContent="＋";p.setAttribute("aria-label","増やす");
+  m.onclick=()=>cb(-1);p.onclick=()=>cb(1);
+  w.append(m,s,p);return w;
+}
+function renderList(root){
+  const hint=document.createElement("p");hint.className="hint";
+  hint.textContent="①予定で予算計算 → ②買ったら「応募・購入した」→ ③当たったら当選カウントUP🎉";
+  root.appendChild(hint);
+  state.events.forEach(ev=>{
+    const c=document.createElement("div");c.className="tix "+(ev.win||"");
+    const r1=document.createElement("div");r1.className="row1";
+    const nm=document.createElement("div");nm.className="name";
+    nm.textContent=ev.name+(ev.part&&ev.part!=="ー"?"["+ev.part+"]":"")+(ev.wins>0?" 🎉".repeat(Math.min(ev.wins,3)):"");
+    r1.appendChild(nm);
+    if(ev.win){
+      const b=document.createElement("span");b.className="badge "+ev.win;
+      b.textContent=ev.win==="ums"?"ユニバ":"楽天";r1.appendChild(b);
+    }
+    c.appendChild(r1);
+    const pd=document.createElement("div");pd.className="period";
+    pd.textContent=ev.deadline?("申込 "+ev.period+"(23:59まで)"):ev.period;
+    c.appendChild(pd);
+    if(RESULTS[ev.id]){
+      const rd=document.createElement("div");rd.className="heldat";
+      rd.textContent="🎲 当落通知 "+RESULTS[ev.id].t;
+      c.appendChild(rd);
+    }
+    if(ev.id==="cardsign"){
+      const ha=document.createElement("div");ha.className="heldat";
+      ha.textContent="開催 11/19(木) 立川ステージガーデン ※5周年ライブ終演後";
+      c.appendChild(ha);
+    }
+    if(ev.custom){
+      const ed=document.createElement("div");ed.className="heldat";
+      ed.style.cssText="display:flex;align-items:center;gap:6px;flex-wrap:wrap";
+      const ni=document.createElement("input");ni.type="text";ni.value=ev.name;ni.placeholder="イベント名";
+      ni.style.cssText="flex:1;min-width:130px;font-family:inherit;font-size:15px;padding:4px 8px;border:1.5px solid var(--line);border-radius:8px";
+      ni.onchange=()=>{ev.name=ni.value||"新イベント";save();render();};
+      const di=document.createElement("input");di.type="date";di.value=ev.deadline||"";
+      di.style.cssText="font-family:inherit;font-size:15px;padding:4px 8px;border:1.5px solid var(--line);border-radius:8px";
+      di.onchange=()=>{ev.deadline=di.value||null;save();render();};
+      const del=document.createElement("button");del.textContent="✕";
+      del.style.cssText="font-family:inherit;font-size:15px;font-weight:700;border:1.5px solid var(--line);background:#fff;color:var(--sub);border-radius:8px;padding:4px 10px";
+      del.onclick=()=>{
+        if(!del.dataset.arm){del.dataset.arm="1";del.textContent="削除?";del.style.color="var(--rkt)";del.style.borderColor="var(--rkt)";
+          setTimeout(()=>{if(del.dataset.arm){delete del.dataset.arm;del.textContent="✕";del.style.color="";del.style.borderColor="";}},3000);
+          return;}
+        state.events=state.events.filter(x=>x.id!==ev.id);save();render();
+      };
+      ed.append(ni,di,del);c.appendChild(ed);
+      const lb=document.createElement("div");lb.className="hint";lb.textContent="名前と締切日を入力してね(締切は予定表に載るよ)";
+      c.appendChild(lb);
+    }
+    if(ev.id==="online"){
+      const ha=document.createElement("div");ha.className="heldat";
+      ha.style.cssText="display:flex;align-items:center;gap:8px";
+      const lb=document.createElement("span");lb.textContent="開催日:";
+      const di=document.createElement("input");di.type="date";di.value=ev.eventDate||"";
+      di.style.cssText="font-family:inherit;font-size:15px;padding:4px 8px;border:1.5px solid var(--line);border-radius:8px";
+      di.onchange=()=>{ev.eventDate=di.value;save();toast("開催日を予定表に入れたよ");};
+      ha.append(lb,di);c.appendChild(ha);
+    }
+    const TIMES={
+      gs1:"受11:40/締12:00/始12:00",gs2:"受12:30/締12:45/始12:45",gs3:"受13:15/締13:30/始13:30",
+      bs1:"受14:00/締14:15/始14:15",bs2:"受14:30/締14:45/始14:45",
+      sign1:"受14:55/締15:20/始15:20",sign2:"受15:40/締16:05/始16:05",
+      aku1:"受16:25/締16:40/始16:45",aku2:"受17:00/締17:15/始17:20",
+      xmas1:"受17:40/締17:55/始17:55",xmas2:"受18:10/締18:25/始18:25",
+      papa:"受19:30/締19:40/始19:40"
+    };
+    if(TIMES[ev.id]){
+      const ha=document.createElement("div");ha.className="heldat";
+      ha.textContent="開催 12/26(土) "+TIMES[ev.id]+" ＠TOC有明";
+      c.appendChild(ha);
+    }
+    // planned (budget calc) — hidden once applied to keep the card tidy? keep visible but compact
+    if(!ev.applied){
+      const pc=document.createElement("div");pc.className="counts";
+      const cap=document.createElement("div");cap.className="cap";cap.textContent="購入予定(予算計算)"+(TNOTES[ev.id]?" ・"+TNOTES[ev.id]:"");
+      pc.appendChild(cap);
+      editionsFor(ev).forEach(([k,label])=>{
+        const row=document.createElement("div");row.className="crow";
+        const m=unitOf(ev,k);
+        const ed=document.createElement("span");ed.className="ed";ed.textContent=label+(m>1?"×"+m+"枚":"");
+        const pr=document.createElement("span");pr.className="price";pr.textContent=yen((state.prices[k]||0)*m);
+        row.append(ed,pr,stepper(ev.plan[k],d=>{ev.plan[k]=Math.max(0,ev.plan[k]+d);save();render();}));
+        pc.appendChild(row);
+      });
+      const pa=document.createElement("div");pa.className="amt";
+      pa.innerHTML="<small>予定</small>"+yen(amountEv(ev,ev.plan));
+      pc.appendChild(pa);
+      c.appendChild(pc);
+    }
+    // apply button
+    const ab=document.createElement("button");
+    ab.className="applybtn"+(ev.applied?" on":"");
+    ab.textContent=ev.applied?"✔ 応募・購入済み(タップで取消)":"応募・購入した!";
+    ab.onclick=()=>{
+      if(ev.applied){
+        if(!ab.dataset.arm){
+          ab.dataset.arm="1";
+          ab.textContent="本当に取り消す?(もう一度タップ)";
+          ab.style.borderColor="var(--rkt)";ab.style.color="var(--rkt)";ab.style.background="var(--rkt-soft)";
+          setTimeout(()=>{if(ab.dataset.arm){delete ab.dataset.arm;render();}},3000);
+          return;
+        }
+        delete ab.dataset.arm;
+        ev.applied=false;ev.wins=0;
+        toast("未応募に戻したよ");
+      }else{
+        ev.applied=true;
+        const empty=!ev.conf.f&&!ev.conf.i&&!ev.conf.c;
+        if(empty)ev.conf={...ev.plan};
+        toast("購入おつかれすみ〜🐙 確定に記録したよ");
+      }
+      save();render();
+    };
+    c.appendChild(ab);
+    // confirmed + wins (applied only)
+    if(ev.applied){
+      const cc=document.createElement("div");cc.className="counts";
+      const cap2=document.createElement("div");cap2.className="cap";cap2.textContent="購入した枚数(確定)"+(TNOTES[ev.id]?" ・"+TNOTES[ev.id]:"");
+      cc.appendChild(cap2);
+      editionsFor(ev).forEach(([k,label])=>{
+        const row=document.createElement("div");row.className="crow";
+        const m=unitOf(ev,k);
+        const ed=document.createElement("span");ed.className="ed";ed.textContent=label+(m>1?"×"+m+"枚":"");
+        const pr=document.createElement("span");pr.className="price";pr.textContent=yen((state.prices[k]||0)*m);
+        row.append(ed,pr,stepper(ev.conf[k],d=>{ev.conf[k]=Math.max(0,ev.conf[k]+d);save();render();}));
+        cc.appendChild(row);
+      });
+      const ca=document.createElement("div");ca.className="amt";
+      ca.innerHTML="<small>確定</small>"+yen(amountEv(ev,ev.conf));
+      cc.appendChild(ca);
+      c.appendChild(cc);
+      if(ev.id==="online"){
+        ev.parts=ev.parts||{};
+        const pb=document.createElement("div");pb.className="counts";
+        const pc=document.createElement("div");pc.className="cap";
+        pc.textContent="当選した部と口数(11/1 全10部)";
+        pb.appendChild(pc);
+        ONLINE_PARTS.forEach(([nm,tm])=>{
+          const n=ev.parts[nm]||0;
+          const row=document.createElement("div");row.className="crow";
+          const ed=document.createElement("span");ed.className="ed";
+          ed.textContent=nm+" "+tm;
+          if(n>0)ed.style.fontWeight="900";
+          row.append(ed,stepper(n,d=>{
+            const nv=Math.max(0,(ev.parts[nm]||0)+d);
+            if(nv>(ev.parts[nm]||0))toast("おめでとうすみ〜!!🎉🐙");
+            ev.parts[nm]=nv;
+            ev.wins=Object.values(ev.parts).reduce((s,v)=>s+v,0);
+            save();render();
+          }));
+          pb.appendChild(row);
+        });
+        const tot=document.createElement("div");tot.className="amt";
+        tot.innerHTML="<small>合計</small>"+(ev.wins||0)+"口"+(ev.wins?"🎉":"");
+        pb.appendChild(tot);
+        c.appendChild(pb);
+      }else if(ev.wins===0){
+        const wbtn=document.createElement("button");wbtn.className="winbtn";
+        const r=RESULTS[ev.id];
+        const early=r&&new Date(r.d+"T00:00:00")>new Date(new Date().toDateString());
+        wbtn.textContent="当選！🎉";
+        wbtn.onclick=()=>{
+          if(early&&!wbtn.dataset.arm){
+            wbtn.dataset.arm="1";
+            wbtn.textContent="当落発表は"+r.t.split("(")[0]+"だよ。それでも記録する?";
+            wbtn.style.fontSize="16px";
+            setTimeout(()=>{if(wbtn.dataset.arm){delete wbtn.dataset.arm;render();}},4000);
+            return;
+          }
+          ev.wins=1;toast("おめでとうすみ〜!!🎉🎉🐙");save();render();
+        };
+        c.appendChild(wbtn);
+      }else{
+        const wb=document.createElement("div");wb.className="winbox";
+        const wl=document.createElement("div");wl.className="wl";
+        wl.textContent="当選 "+ev.wins+"口🎉";
+        wb.appendChild(wl);
+        wb.appendChild(stepper(ev.wins,d=>{
+          const nv=Math.max(0,ev.wins+d);
+          if(nv>ev.wins)toast("おめでとうすみ〜!!🎉🐙");
+          ev.wins=nv;save();render();
+        }));
+        c.appendChild(wb);
+      }
+    }
+    root.appendChild(c);
+  });
+  const add=document.createElement("button");
+  add.textContent="＋ イベントを追加(リリイベなど)";
+  add.style.cssText="width:100%;font-family:inherit;font-size:16px;font-weight:700;padding:12px 0;border-radius:14px;border:2px dashed var(--violet);background:#fff;color:var(--violet)";
+  add.onclick=()=>{
+    state.events.push({id:"custom"+Date.now(),name:"新イベント",part:"ー",period:"",deadline:null,win:"",applied:false,wins:0,custom:true,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}});
+    save();render();toast("追加したよ!名前と締切日を入れてね");
+  };
+  root.appendChild(add);
+}
+function renderSchedule(root){
+  const hint=document.createElement("p");hint.className="hint";
+  hint.textContent="締切順。済んだものは自動でうすくなるよ";
+  root.appendChild(hint);
+  const today=new Date();today.setHours(0,0,0,0);
+  const items=state.events.filter(e=>e.deadline).map(e=>({
+    date:e.deadline,label:e.name+(e.part!=="ー"?"["+e.part+"]":"")+" 申込締切",
+    cls:e.win,done:e.applied||new Date(e.deadline)<today,
+    applied:e.applied,wins:e.wins
+  })).concat(MILES.map(m=>({date:m.date,label:m.label,cls:"mile",done:new Date(m.date)<today})))
+  .concat(state.events.filter(e=>e.id==="online"&&e.eventDate).map(e=>({date:e.eventDate,label:"💻 個別オンライン 開催日",cls:"",done:new Date(e.eventDate)<today})))
+  .concat(state.events.filter(e=>e.applied&&RESULTS[e.id]).map(e=>({date:RESULTS[e.id].d,label:"🎲 "+e.name+(e.part!=="ー"?"["+e.part+"]":"")+" 当落発表",cls:"",done:new Date(RESULTS[e.id].d)<today||e.wins>0,wins:e.wins})))
+  .concat(state.events.some(e=>e.wins>0&&RESULTS[e.id]&&e.id!=="cardsign")?[{date:NOTICE.date,label:NOTICE.label,cls:"mile",done:new Date(NOTICE.date)<today}]:[]);
+  items.sort((a,b)=>a.date<b.date?-1:1);
+  items.forEach(it=>{
+    const d=new Date(it.date+"T00:00:00");
+    const diff=Math.round((d-today)/86400000);
+    const el=document.createElement("div");el.className="day "+it.cls+(it.done&&!it.wins?" done":"");
+    const dt=document.createElement("div");dt.className="date";
+    dt.innerHTML='<div class="d">'+(d.getMonth()+1)+"/"+d.getDate()+'</div><div class="w">'+["日","月","火","水","木","金","土"][d.getDay()]+"</div>";
+    const bd=document.createElement("div");bd.className="body";
+    const t=document.createElement("div");t.className="t";t.textContent=it.label;
+    const cd=document.createElement("div");cd.className="cd";
+    if(it.wins>0)cd.textContent="当選"+it.wins+"口🎉";
+    else if(it.applied)cd.textContent="応募済・結果待ちすみ";
+    else if(diff<0)cd.textContent="終了";
+    else if(diff===0)cd.innerHTML="<b>今日23:59まで!</b>";
+    else if(diff<=3)cd.innerHTML="<b>あと"+diff+"日</b>";
+    else cd.textContent="あと"+diff+"日";
+    bd.append(t,cd);el.append(dt,bd);root.appendChild(el);
+  });
+}
+function renderSummary(root){
+  let plan=0,conf=0,planN=0,confN=0,wins=0,applied=0;
+  const byWin={ums:0,rkt:0,other:0};
+  const planBy={f:0,i:0,c:0},confBy={f:0,i:0,c:0};
+  state.events.forEach(e=>{
+    if(!e.applied){
+      plan+=amountEv(e,e.plan);
+      planN+=sheetsEv(e,e.plan);
+      ["f","i","c"].forEach(k=>planBy[k]+=e.plan[k]*unitOf(e,k));
+    }
+    if(e.applied){
+      conf+=amountEv(e,e.conf);
+      confN+=sheetsEv(e,e.conf);
+      ["f","i","c"].forEach(k=>confBy[k]+=e.conf[k]*unitOf(e,k));
+      applied++;
+      byWin[e.win||"other"]+=amountEv(e,e.conf);
+    }
+    wins+=e.wins;
+  });
+  const s1=document.createElement("div");s1.className="sumcard";
+  s1.innerHTML="<h3>💰 お金の集計</h3>"
+    +'<div class="srow"><span>予定金額(未購入の計画分)</span><b>'+yen(plan)+"</b></div>"
+    +'<div class="srow"><span>購入金額(確定)</span><b>'+yen(conf)+"</b></div>"
+    +'<div class="srow"><span>見込み総額(確定＋予定)</span><b>'+yen(plan+conf)+"</b></div>"
+    +'<div class="srow"><span>枚数(予定 / 購入)</span><b></b></div>'
+    +'<div class="srow"><span>　フラッシュ盤</span><b>'+planBy.f+"枚 / "+confBy.f+"枚</b></div>"
+    +'<div class="srow"><span>　初回限定盤</span><b>'+planBy.i+"枚 / "+confBy.i+"枚</b></div>"
+    +'<div class="srow"><span>　FC限定盤</span><b>'+planBy.c+"枚 / "+confBy.c+"枚</b></div>"
+    +'<div class="srow"><span>　合計</span><b>'+planN+"枚 / "+confN+"枚</b></div>";
+  const s2=document.createElement("div");s2.className="sumcard";
+  s2.innerHTML="<h3>🎯 応募の状況</h3>"
+    +'<div class="srow"><span>応募・購入済み</span><b>'+applied+"件</b></div>"
+    +'<div class="srow"><span>当選口数の合計🎉</span><b>'+wins+"口</b></div>"
+    +'<div class="srow"><span>ユニバ購入額</span><b>'+yen(byWin.ums)+"</b></div>"
+    +'<div class="srow"><span>楽天購入額</span><b>'+yen(byWin.rkt)+"</b></div>";
+  const s3=document.createElement("div");s3.className="sumcard prices";
+  s3.innerHTML="<h3>🏷️ 単価設定(税込)</h3>";
+  EDITIONS.forEach(([k,label])=>{
+    const row=document.createElement("div");row.className="srow";
+    const sp=document.createElement("span");sp.textContent=label+(k==="c"?"(未定なら0)":"");
+    const inp=document.createElement("input");inp.type="number";inp.min="0";inp.value=state.prices[k]||0;
+    inp.onchange=()=>{state.prices[k]=Math.max(0,Number(inp.value)||0);save();render();};
+    row.append(sp,inp);s3.appendChild(row);
+  });
+  root.append(s1,s2,s3);
+  const s4=document.createElement("div");s4.className="sumcard";
+  s4.innerHTML="<h3>💾 バックアップ</h3><p style='font-size:13px;color:var(--sub);margin-bottom:8px'>自動保存が効かないときはここからデータを退避してね。「書き出す」→全文コピーしてメモに保存。復元は貼り付けて「読み込む」</p>";
+  const ta=document.createElement("textarea");
+  ta.style.cssText="width:100%;height:90px;font-size:12px;border:1.5px solid var(--line);border-radius:8px;padding:8px;font-family:monospace";
+  ta.placeholder="ここに書き出し/貼り付け";
+  const btnrow=document.createElement("div");btnrow.style.cssText="display:flex;gap:8px;margin-top:8px";
+  const ex=document.createElement("button");
+  ex.style.cssText="flex:1;font-family:inherit;font-size:14px;font-weight:700;padding:9px 0;border-radius:10px;border:1.5px solid var(--violet);background:var(--violet-soft);color:var(--violet)";
+  ex.textContent="書き出す";
+  ex.onclick=()=>{
+    ta.value=JSON.stringify(state);
+    ta.select();ta.setSelectionRange(0,999999);
+    try{document.execCommand("copy");toast("コピーしたよ!メモに貼って保存してね");}
+    catch(e){toast("全選択したよ。手動でコピーしてね");}
+  };
+  const im=document.createElement("button");
+  im.style.cssText="flex:1;font-family:inherit;font-size:14px;font-weight:700;padding:9px 0;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--ink)";
+  im.textContent="読み込む";
+  im.onclick=()=>{
+    try{
+      const d=JSON.parse(ta.value);
+      if(!d.events||!d.prices)throw 0;
+      state=d;save();render();toast("復元できたすみ🐙");
+    }catch(e){toast("読み込めなかった…書き出した文字列を全部貼ってね");}
+  };
+  btnrow.append(ex,im);s4.append(ta,btnrow);root.appendChild(s4);
+  const rs=document.createElement("button");rs.className="reset";rs.textContent="データを最初からやり直す";
+  rs.onclick=async()=>{
+    if(!rs.dataset.arm){
+      rs.dataset.arm="1";
+      rs.textContent="全部消えるよ!本当にやり直すならもう一度タップ";
+      rs.style.color="var(--rkt)";
+      setTimeout(()=>{if(rs.dataset.arm){delete rs.dataset.arm;rs.textContent="データを最初からやり直す";rs.style.color="";}},3000);
+      return;
+    }
+    delete rs.dataset.arm;
+    state=JSON.parse(JSON.stringify(DEFAULT));
+    try{await store.set(KEY,JSON.stringify(state));}catch(e){}
+    render();toast("まっさらにしたすみ🐙");
+  };
+  root.appendChild(rs);
+}
+const LINKS=[
+  {g:"公式のお知らせ(各イベント詳細)",items:[
+    ["オフラインイベントまとめ(全日程・タイムテーブル)","https://octpath-official.com/news/detail/2527"],
+    ["個別サイン会","https://octpath-official.com/news/detail/2528"],
+    ["プレミアムグループサイン会","https://octpath-official.com/news/detail/2530"],
+    ["Best Shot会","https://octpath-official.com/news/detail/2533"],
+    ["個別握手会","https://octpath-official.com/news/detail/2532"],
+    ["クリスマスカード贈りスマス！会","https://octpath-official.com/news/detail/2529"],
+    ["パパラッチ会","https://octpath-official.com/news/detail/2531"],
+    ["カードサイン会","https://octpath-official.com/news/detail/2526"],
+    ["個別オンライントーク会","https://octpath-official.com/news/detail/2497"]
+  ]},
+  {g:"最新情報",items:[
+    ["公式ニュース一覧(新イベントはここでチェック)","https://octpath-official.com/news/1/"]
+  ]}
+];
+function renderLinks(root){
+  const hint=document.createElement("p");hint.className="hint";
+  hint.textContent="タップで公式ページへ飛べるよ";
+  root.appendChild(hint);
+  LINKS.forEach(sec=>{
+    const card=document.createElement("div");card.className="sumcard";
+    card.innerHTML="<h3>🔗 "+sec.g+"</h3>";
+    sec.items.forEach(([label,url])=>{
+      const a=document.createElement("a");
+      a.href=url;a.target="_blank";a.rel="noopener";
+      a.textContent=label+" →";
+      a.style.cssText="display:block;padding:10px 4px;border-bottom:1px solid var(--line);color:var(--violet);font-size:16px;font-weight:700;text-decoration:none";
+      card.appendChild(a);
+    });
+    card.lastChild.style.borderBottom="none";
+    root.appendChild(card);
+  });
+}
+const ONLINE_PARTS=[
+  ["1部","13:00〜13:30","受付12:45〜13:05"],
+  ["2部","13:30〜14:00","受付13:15〜13:35"],
+  ["3部","14:00〜14:30","受付13:45〜14:05"],
+  ["4部","14:30〜15:00","受付14:15〜14:35"],
+  ["5部","15:00〜15:30","受付14:45〜15:05"],
+  ["6部","16:00〜16:30","受付15:45〜16:05"],
+  ["7部","16:30〜17:00","受付16:15〜16:35"],
+  ["8部","17:00〜17:30","受付16:45〜17:05"],
+  ["9部","17:30〜18:00","受付17:15〜17:35"],
+  ["10部","18:00〜18:30","受付17:45〜18:05"]
+];
+const DAYINFO={
+  gs1:{d:"2026-12-26",t:"受11:40/締12:00/始12:00",v:"TOC有明 4F EAST HALL"},
+  gs2:{d:"2026-12-26",t:"受12:30/締12:45/始12:45",v:"TOC有明 4F EAST HALL"},
+  gs3:{d:"2026-12-26",t:"受13:15/締13:30/始13:30",v:"TOC有明 4F EAST HALL"},
+  bs1:{d:"2026-12-26",t:"受14:00/締14:15/始14:15",v:"TOC有明 4F EAST HALL"},
+  bs2:{d:"2026-12-26",t:"受14:30/締14:45/始14:45",v:"TOC有明 4F EAST HALL"},
+  sign1:{d:"2026-12-26",t:"受14:55/締15:20/始15:20",v:"TOC有明 4F EAST HALL"},
+  sign2:{d:"2026-12-26",t:"受15:40/締16:05/始16:05",v:"TOC有明 4F EAST HALL"},
+  aku1:{d:"2026-12-26",t:"受16:25/締16:40/始16:45",v:"TOC有明 4F EAST HALL"},
+  aku2:{d:"2026-12-26",t:"受17:00/締17:15/始17:20",v:"TOC有明 4F EAST HALL"},
+  xmas1:{d:"2026-12-26",t:"受17:40/締17:55/始17:55",v:"TOC有明 4F EAST HALL"},
+  xmas2:{d:"2026-12-26",t:"受18:10/締18:25/始18:25",v:"TOC有明 4F EAST HALL"},
+  papa:{d:"2026-12-26",t:"受19:30/締19:40/始19:40",v:"TOC有明 4F EAST HALL"},
+  cardsign:{d:"2026-11-19",t:"5周年ライブ終演後",v:"立川ステージガーデン"},
+  online:{d:"2026-11-01",t:"時間は参加券で確認",v:"オンライン(Meet Pass)"}
+};
+const BRING={
+  sign1:"参加通知画面(スクショ不可)/顔写真付き身分証/当選数分のフラッシュ盤CDジャケット",
+  sign2:"参加通知画面(スクショ不可)/顔写真付き身分証/当選数分のフラッシュ盤CDジャケット",
+  bs1:"参加通知画面/顔写真付き身分証/FC会員証(WEB版マイページ・アプリ不可)/撮影用スマホ",
+  bs2:"参加通知画面/顔写真付き身分証/FC会員証(WEB版マイページ・アプリ不可)/撮影用スマホ",
+  gs1:"参加通知画面/顔写真付き身分証/FC会員証(WEB版)",
+  gs2:"参加通知画面/顔写真付き身分証/FC会員証(WEB版)",
+  gs3:"参加通知画面/顔写真付き身分証/FC会員証(WEB版)",
+  aku1:"当選QRコード(スクショ・印刷不可)/顔写真付き身分証",
+  aku2:"当選QRコード(スクショ・印刷不可)/顔写真付き身分証",
+  xmas1:"当選QRコード(スクショ・印刷不可)/顔写真付き身分証",
+  xmas2:"当選QRコード(スクショ・印刷不可)/顔写真付き身分証",
+  papa:"当選QRコード(スクショ・印刷不可)/顔写真付き身分証",
+  cardsign:"参加通知/顔写真付き身分証/FC会員証(WEB版)",
+  online:"受け取った参加券(10/23 18:00〜10/31 23:59に要受取!)"
+};
+function renderDay(root){
+  const won=state.events.filter(e=>e.wins>0);
+  if(won.length===0){
+    const p=document.createElement("div");p.className="sumcard";
+    p.innerHTML="<h3>🎫 当選したイベント</h3><p style='font-size:15px;color:var(--sub)'>まだ当選の記録がないすみ🐙<br>申込タブで「当選！🎉」を押すと、ここに当日のスケジュールが並ぶよ</p>";
+    root.appendChild(p);return;
+  }
+  const hint=document.createElement("p");hint.className="hint";
+  hint.textContent="当選したイベントだけを日付・時間順に並べたよ。当日はこの画面を見ながら動いてね";
+  root.appendChild(hint);
+  const byDate={};
+  won.forEach(e=>{
+    const info=DAYINFO[e.id];if(!info)return;
+    (byDate[info.d]=byDate[info.d]||[]).push({e,info});
+  });
+  Object.keys(byDate).sort().forEach(d=>{
+    const dt=new Date(d+"T00:00:00");
+    const card=document.createElement("div");card.className="sumcard";
+    card.innerHTML="<h3>📅 "+(dt.getMonth()+1)+"/"+dt.getDate()+"("+["日","月","火","水","木","金","土"][dt.getDay()]+") "+byDate[d][0].info.v+"</h3>";
+    const rows=[];
+    byDate[d].forEach(({e,info})=>{
+      if(e.id==="online"&&e.parts){
+        ONLINE_PARTS.forEach(([pn,ptm,prec])=>{
+          if(e.parts[pn])rows.push({e,label:"個別オンライン["+pn+"] ×"+e.parts[pn]+"口🎉",time:ptm+" ("+prec+")",sort:ptm});
+        });
+      }else{
+        rows.push({e,label:e.name+(e.part!=="ー"?"["+e.part+"]":"")+" ×"+e.wins+"口🎉",time:info.t,sort:info.t});
+      }
+    });
+    rows.sort((a,b)=>(a.sort>b.sort?1:-1)).forEach(({e,label,time})=>{
+      const row=document.createElement("div");
+      row.style.cssText="padding:10px 0;border-bottom:1px solid var(--line)";
+      const nm=document.createElement("div");
+      nm.style.cssText="font-size:17px;font-weight:900";
+      nm.textContent=label;
+      const tm=document.createElement("div");
+      tm.style.cssText="font-size:16px;font-weight:700;color:var(--violet);margin-top:2px";
+      tm.textContent="⏰ "+time;
+      row.append(nm,tm);
+      if(BRING[e.id]){
+        const br=document.createElement("div");
+        br.style.cssText="font-size:14px;color:var(--sub);margin-top:4px";
+        br.textContent="🎒 "+BRING[e.id];
+        row.appendChild(br);
+      }
+      card.appendChild(row);
+    });
+    card.lastChild.style.borderBottom="none";
+    root.appendChild(card);
+  });
+  const memo=document.createElement("div");memo.className="sumcard";
+  memo.innerHTML="<h3>📝 共通の持ち物メモ</h3><div style='font-size:15px;line-height:1.8'>・顔写真付きの本人確認書類(原本)<br>・参加通知/QRコードを表示できるスマホ(通信できる状態で)<br>・複数当選は部ごとに受付が必要。早めに動こう<br>・荷物は肩にかけられる1点まで(キャリー不可)</div>";
+  root.appendChild(memo);
+}
+function render(){
+  header();
+  ["tab0","tab1","tab2","tab3","tab4"].forEach((id,i)=>document.getElementById(id).classList.toggle("on",tab===i));
+  const m=document.getElementById("main");m.innerHTML="";
+  if(tab===0)renderList(m);
+  if(tab===1)renderSchedule(m);
+  if(tab===2)renderSummary(m);
+  if(tab===3)renderDay(m);
+  if(tab===4)renderLinks(m);
+  const oc=document.createElement("div");oc.className="octo";oc.textContent="🐙 記録は自動保存だすみ";
+  m.appendChild(oc);
+}
+["tab0","tab1","tab2","tab3","tab4"].forEach((id,i)=>document.getElementById(id).onclick=()=>{tab=i;render();});
+load();
+</script>
+</body>
+</html>
