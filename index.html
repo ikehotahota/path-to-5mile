@@ -26,7 +26,7 @@ header .sub{font-size:13px;opacity:.85;margin-top:2px}
 .money .lbl{font-size:11px;opacity:.9}
 .money .val{font-family:"Mochiy Pop One",sans-serif;font-size:17px;font-weight:400;margin-top:2px;white-space:nowrap}
 nav{display:flex;gap:4px;padding:10px 16px 6px;position:sticky;top:74px;background:var(--bg);z-index:19}
-nav button{flex:1;border:none;background:#fff;border:1.5px solid var(--line);color:var(--sub);font-family:inherit;font-weight:700;font-size:14px;padding:9px 2px;border-radius:999px;cursor:pointer}
+nav button{flex:1;border:none;background:#fff;border:1.5px solid var(--line);color:var(--sub);font-family:inherit;font-weight:700;font-size:13px;padding:9px 1px;border-radius:999px;cursor:pointer;white-space:nowrap}
 nav button.on{background:var(--ink);border-color:var(--ink);color:#fff}
 main{padding:10px 16px}
 .hint{font-size:13px;color:var(--sub);margin:4px 2px 10px}
@@ -56,7 +56,13 @@ main{padding:10px 16px}
 .winbox{margin-top:10px;background:var(--win-soft);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px}
 .winbox .wl{flex:1;font-size:16px;font-weight:700;color:#8a6d0d}
 .winbox .step button{color:#8a6d0d}
-.winbtn{width:100%;margin-top:10px;font-family:inherit;font-size:18px;font-weight:900;padding:12px 0;border-radius:12px;border:2px solid var(--win);background:var(--win-soft);color:#8a6d0d;cursor:pointer}
+.winbtn{flex:2;font-family:"Mochiy Pop One",sans-serif;font-size:19px;font-weight:400;padding:12px 0;border-radius:12px;border:2px solid var(--win);background:var(--win-soft);color:#8a6d0d;cursor:pointer}
+.btnrow{display:flex;gap:8px;margin-top:10px}
+.losebtn{flex:1;font-family:inherit;font-size:16px;font-weight:700;padding:12px 0;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
+.losebtn:active{transform:scale(.97)}
+.losebox{margin-top:10px;background:#F1F0F5;border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:8px}
+.losebox .ll{flex:1;font-size:16px;font-weight:700;color:var(--sub)}
+.losebox button{font-family:inherit;font-size:14px;font-weight:700;border:1.5px solid var(--line);background:#fff;color:var(--sub);border-radius:8px;padding:6px 12px;cursor:pointer}
 .winbtn:active{transform:scale(.97)}
 .day{display:flex;gap:10px;margin-bottom:10px;align-items:stretch}
 .day .date{width:72px;flex-shrink:0;text-align:center;background:#fff;border-radius:12px;padding:8px 0;border:1.5px solid var(--line)}
@@ -100,8 +106,9 @@ main{padding:10px 16px}
   <button id="tab2">集計</button>
   <button id="tab3">当日</button>
   <button id="tab4">リンク</button>
+  <button id="tab5">使い方</button>
 </nav>
-<main id="main"><div class="loading">読み込み中だすみ…🐙</div></main>
+<main id="main"><div class="loading">読み込み中…🐙</div></main>
 <div class="toast" id="toast"></div>
 <script>
 const KEY="5mile-ledger-v1";
@@ -201,7 +208,7 @@ async function load(){
     const r=await store.get(KEY);
     if(r&&r.value){state=JSON.parse(r.value);}
   }catch(e){/* first run */}
-  if(!state)state=JSON.parse(JSON.stringify(DEFAULT));
+  if(!state){state=JSON.parse(JSON.stringify(DEFAULT));tab=5;}
   // migrate from old status-based format
   state.events.forEach(e=>{
     if(e.applied===undefined)e.applied=(e.status==="applied"||e.status==="won"||e.status==="lost");
@@ -232,7 +239,7 @@ function save(){
 }
 function warnOnce(){
   if(warned)return;warned=true;
-  toast("この画面は自動保存が効かないみたい。集計タブのバックアップを使ってね🐙");
+  toast("この画面では自動保存が効かないみたい。集計タブのバックアップを使ってね🐙");
 }
 function toast(msg){
   const t=document.getElementById("toast");
@@ -360,13 +367,13 @@ function renderList(root){
           return;
         }
         delete ab.dataset.arm;
-        ev.applied=false;ev.wins=0;
+        ev.applied=false;ev.wins=0;ev.lost=false;
         toast("未応募に戻したよ");
       }else{
         ev.applied=true;
         const empty=!ev.conf.f&&!ev.conf.i&&!ev.conf.c;
         if(empty)ev.conf={...ev.plan};
-        toast("購入おつかれすみ〜🐙 確定に記録したよ");
+        toast("購入おつかれさま🐙 確定に記録したよ");
       }
       save();render();
     };
@@ -402,7 +409,7 @@ function renderList(root){
           if(n>0)ed.style.fontWeight="900";
           row.append(ed,stepper(n,d=>{
             const nv=Math.max(0,(ev.parts[nm]||0)+d);
-            if(nv>(ev.parts[nm]||0))toast("おめでとうすみ〜!!🎉🐙");
+            if(nv>(ev.parts[nm]||0))toast("おめでとう！！🎉🐙");
             ev.parts[nm]=nv;
             ev.wins=Object.values(ev.parts).reduce((s,v)=>s+v,0);
             save();render();
@@ -413,7 +420,15 @@ function renderList(root){
         tot.innerHTML="<small>合計</small>"+(ev.wins||0)+"口"+(ev.wins?"🎉":"");
         pb.appendChild(tot);
         c.appendChild(pb);
+      }else if(ev.lost){
+        const lb=document.createElement("div");lb.className="losebox";
+        const ll=document.createElement("div");ll.className="ll";
+        ll.textContent="残念…また次があるよ😢🐙";
+        const un=document.createElement("button");un.textContent="取消";
+        un.onclick=()=>{ev.lost=false;save();render();};
+        lb.append(ll,un);c.appendChild(lb);
       }else if(ev.wins===0){
+        const brow=document.createElement("div");brow.className="btnrow";
         const wbtn=document.createElement("button");wbtn.className="winbtn";
         const r=RESULTS[ev.id];
         const early=r&&new Date(r.d+"T00:00:00")>new Date(new Date().toDateString());
@@ -421,14 +436,18 @@ function renderList(root){
         wbtn.onclick=()=>{
           if(early&&!wbtn.dataset.arm){
             wbtn.dataset.arm="1";
-            wbtn.textContent="当落発表は"+r.t.split("(")[0]+"だよ。それでも記録する?";
-            wbtn.style.fontSize="16px";
+            wbtn.textContent="発表前だよ。それでも記録する?";
+            wbtn.style.fontSize="15px";
             setTimeout(()=>{if(wbtn.dataset.arm){delete wbtn.dataset.arm;render();}},4000);
             return;
           }
-          ev.wins=1;toast("おめでとうすみ〜!!🎉🎉🐙");save();render();
+          ev.wins=1;toast("おめでとう！！🎉🎉🐙");save();render();
         };
-        c.appendChild(wbtn);
+        const lbtn=document.createElement("button");lbtn.className="losebtn";
+        lbtn.textContent="残念😢";
+        lbtn.onclick=()=>{ev.lost=true;toast("おつかれさま🐙 次があるよ");save();render();};
+        brow.append(wbtn,lbtn);
+        c.appendChild(brow);
       }else{
         const wb=document.createElement("div");wb.className="winbox";
         const wl=document.createElement("div");wl.className="wl";
@@ -436,7 +455,7 @@ function renderList(root){
         wb.appendChild(wl);
         wb.appendChild(stepper(ev.wins,d=>{
           const nv=Math.max(0,ev.wins+d);
-          if(nv>ev.wins)toast("おめでとうすみ〜!!🎉🐙");
+          if(nv>ev.wins)toast("おめでとう！！🎉🐙");
           ev.wins=nv;save();render();
         }));
         c.appendChild(wb);
@@ -461,10 +480,10 @@ function renderSchedule(root){
   const items=state.events.filter(e=>e.deadline).map(e=>({
     date:e.deadline,label:e.name+(e.part!=="ー"?"["+e.part+"]":"")+" 申込締切",
     cls:e.win,done:e.applied||new Date(e.deadline)<today,
-    applied:e.applied,wins:e.wins
+    applied:e.applied,wins:e.wins,lost:e.lost
   })).concat(MILES.map(m=>({date:m.date,label:m.label,cls:"mile",done:new Date(m.date)<today})))
   .concat(state.events.filter(e=>e.id==="online"&&e.eventDate).map(e=>({date:e.eventDate,label:"💻 個別オンライン 開催日",cls:"",done:new Date(e.eventDate)<today})))
-  .concat(state.events.filter(e=>e.applied&&RESULTS[e.id]).map(e=>({date:RESULTS[e.id].d,label:"🎲 "+e.name+(e.part!=="ー"?"["+e.part+"]":"")+" 当落発表",cls:"",done:new Date(RESULTS[e.id].d)<today||e.wins>0,wins:e.wins})))
+  .concat(state.events.filter(e=>e.applied&&RESULTS[e.id]).map(e=>({date:RESULTS[e.id].d,label:"🎲 "+e.name+(e.part!=="ー"?"["+e.part+"]":"")+" 当落発表",cls:"",done:new Date(RESULTS[e.id].d)<today||e.wins>0||e.lost,wins:e.wins,lost:e.lost})))
   .concat(state.events.some(e=>e.wins>0&&RESULTS[e.id]&&e.id!=="cardsign")?[{date:NOTICE.date,label:NOTICE.label,cls:"mile",done:new Date(NOTICE.date)<today}]:[]);
   items.sort((a,b)=>a.date<b.date?-1:1);
   items.forEach(it=>{
@@ -477,7 +496,8 @@ function renderSchedule(root){
     const t=document.createElement("div");t.className="t";t.textContent=it.label;
     const cd=document.createElement("div");cd.className="cd";
     if(it.wins>0)cd.textContent="当選"+it.wins+"口🎉";
-    else if(it.applied)cd.textContent="応募済・結果待ちすみ";
+    else if(it.lost)cd.textContent="残念…おつかれさま😢";
+    else if(it.applied)cd.textContent="応募済・結果待ち";
     else if(diff<0)cd.textContent="終了";
     else if(diff===0)cd.innerHTML="<b>今日23:59まで!</b>";
     else if(diff<=3)cd.innerHTML="<b>あと"+diff+"日</b>";
@@ -486,7 +506,7 @@ function renderSchedule(root){
   });
 }
 function renderSummary(root){
-  let plan=0,conf=0,planN=0,confN=0,wins=0,applied=0;
+  let plan=0,conf=0,planN=0,confN=0,wins=0,applied=0,lost=0,waiting=0;
   const byWin={ums:0,rkt:0,other:0};
   const planBy={f:0,i:0,c:0},confBy={f:0,i:0,c:0};
   state.events.forEach(e=>{
@@ -503,6 +523,7 @@ function renderSummary(root){
       byWin[e.win||"other"]+=amountEv(e,e.conf);
     }
     wins+=e.wins;
+    if(e.applied){if(e.lost)lost++;else if(e.wins===0)waiting++;}
   });
   const s1=document.createElement("div");s1.className="sumcard";
   s1.innerHTML="<h3>💰 お金の集計</h3>"
@@ -518,6 +539,7 @@ function renderSummary(root){
   s2.innerHTML="<h3>🎯 応募の状況</h3>"
     +'<div class="srow"><span>応募・購入済み</span><b>'+applied+"件</b></div>"
     +'<div class="srow"><span>当選口数の合計🎉</span><b>'+wins+"口</b></div>"
+    +'<div class="srow"><span>結果待ち / 残念</span><b>'+waiting+"件 / "+lost+"件</b></div>"
     +'<div class="srow"><span>ユニバ購入額</span><b>'+yen(byWin.ums)+"</b></div>"
     +'<div class="srow"><span>楽天購入額</span><b>'+yen(byWin.rkt)+"</b></div>";
   const s3=document.createElement("div");s3.className="sumcard prices";
@@ -552,7 +574,7 @@ function renderSummary(root){
     try{
       const d=JSON.parse(ta.value);
       if(!d.events||!d.prices)throw 0;
-      state=d;save();render();toast("復元できたすみ🐙");
+      state=d;save();render();toast("復元できたよ🐙");
     }catch(e){toast("読み込めなかった…書き出した文字列を全部貼ってね");}
   };
   btnrow.append(ex,im);s4.append(ta,btnrow);root.appendChild(s4);
@@ -568,7 +590,7 @@ function renderSummary(root){
     delete rs.dataset.arm;
     state=JSON.parse(JSON.stringify(DEFAULT));
     try{await store.set(KEY,JSON.stringify(state));}catch(e){}
-    render();toast("まっさらにしたすみ🐙");
+    render();toast("まっさらにしたよ🐙");
   };
   root.appendChild(rs);
 }
@@ -654,7 +676,7 @@ function renderDay(root){
   const won=state.events.filter(e=>e.wins>0);
   if(won.length===0){
     const p=document.createElement("div");p.className="sumcard";
-    p.innerHTML="<h3>🎫 当選したイベント</h3><p style='font-size:15px;color:var(--sub)'>まだ当選の記録がないすみ🐙<br>申込タブで「当選！🎉」を押すと、ここに当日のスケジュールが並ぶよ</p>";
+    p.innerHTML="<h3>🎫 当選したイベント</h3><p style='font-size:15px;color:var(--sub)'>まだ当選の記録がないよ🐙<br>申込タブで「当選！🎉」を押すと、ここに当日のスケジュールが並ぶよ</p>";
     root.appendChild(p);return;
   }
   const hint=document.createElement("p");hint.className="hint";
@@ -704,19 +726,62 @@ function renderDay(root){
   memo.innerHTML="<h3>📝 共通の持ち物メモ</h3><div style='font-size:15px;line-height:1.8'>・顔写真付きの本人確認書類(原本)<br>・参加通知/QRコードを表示できるスマホ(通信できる状態で)<br>・複数当選は部ごとに受付が必要。早めに動こう<br>・荷物は肩にかけられる1点まで(キャリー不可)</div>";
   root.appendChild(memo);
 }
+function renderHelp(root){
+  const warn=document.createElement("div");
+  warn.className="sumcard";
+  warn.style.cssText="border:2px solid var(--rkt);background:var(--rkt-soft)";
+  warn.innerHTML="<h3 style='font-size:17px'>⚠️ さいしょに読んでね</h3>"
+   +"<div style='font-size:15px;line-height:1.9'>"
+   +"<b>🔒 入力した記録は自分のスマホの中だけに保存されます。</b>誰かに共有されたり、作った人に見られたりすることは一切ありません。安心して使ってね。<br><br>"
+   +"<b>📢 これは非公式のファンツールです。</b>日程や金額はチェックしていますが、間違いや変更が反映されていない可能性があります。<b>申込の前には必ず公式のお知らせをご確認ください。</b>このツールの情報による誤認・申込漏れなどについて責任は負いかねます。その点をご了承のうえご使用ください。<br><br>"
+   +"<b>💾 記録が消えることがあります。</b>ブラウザの履歴やサイトデータを削除すると記録も消えます。大事な記録は「集計」タブの💾バックアップで書き出しておくと安心です。"
+   +"</div>";
+  root.appendChild(warn);
+
+  const steps=[
+    ["① 申込タブ：買う前に予算を計算","イベントごとに『購入予定』の＋−で口数を入れると金額が出ます。対象の盤は自動で切り替わるので、そのイベントで買えるものだけが表示されます。"],
+    ["② 買ったら「応募・購入した！」","このボタンを押すと予定→確定に変わり、上の『購入金額』に反映されます。押し間違えたらもう一度タップ（2回押しで取消）。"],
+    ["③ 当たったら「当選！🎉」","当落発表日より前に押すと確認が出ます。複数口当たったら＋−で口数を直せます。個別オンラインは1部〜10部それぞれで記録できます。"],
+    ["④ 予定表タブ：締切と発表日","申込締切・当落発表日・発売日などが日付順に並びます。『あと◯日』が出るので、うっかり忘れ防止に。応募したイベントの当落発表日だけが表示されます。"],
+    ["⑤ 集計タブ：合計を確認","予定・購入金額、盤ごとの枚数、当選口数、窓口別の金額が見られます。単価の変更もここから。"],
+    ["⑥ 当日タブ：当選したものだけ","当選を記録すると、当日のスケジュールが日付・時間順に並びます。イベントごとの持ち物も出るので、当日はこの画面を見ながら動けます。"],
+    ["⑦ リンクタブ：公式ページへ","各イベントの公式お知らせに飛べます。申込の詳細・最新情報は必ずこちらで。"]
+  ];
+  const card=document.createElement("div");card.className="sumcard";
+  card.innerHTML="<h3>📖 使い方</h3>";
+  steps.forEach(([t,d])=>{
+    const b=document.createElement("div");
+    b.style.cssText="padding:10px 0;border-bottom:1px solid var(--line)";
+    b.innerHTML="<div style='font-size:16px;font-weight:900;margin-bottom:3px'>"+t+"</div>"
+      +"<div style='font-size:15px;color:var(--sub);line-height:1.7'>"+d+"</div>";
+    card.appendChild(b);
+  });
+  card.lastChild.style.borderBottom="none";
+  root.appendChild(card);
+
+  const tips=document.createElement("div");tips.className="sumcard";
+  tips.innerHTML="<h3>💡 ちょっとしたコツ</h3><div style='font-size:15px;line-height:1.9'>"
+   +"・ホーム画面に追加するとアプリのように開けます（共有ボタン→ホーム画面に追加）<br>"
+   +"・リリイベなど新しいイベントは、申込タブ下の『＋イベントを追加』から自分で足せます<br>"
+   +"・個別サイン会は2枚セットで1口なので、数字は『口数』を入れてください<br>"
+   +"・結果が出たら『当選！🎉』か『残念😢』を押すと記録が残ります（あとから取消もできます）🍀"
+   +"</div>";
+  root.appendChild(tips);
+}
 function render(){
   header();
-  ["tab0","tab1","tab2","tab3","tab4"].forEach((id,i)=>document.getElementById(id).classList.toggle("on",tab===i));
+  ["tab0","tab1","tab2","tab3","tab4","tab5"].forEach((id,i)=>document.getElementById(id).classList.toggle("on",tab===i));
   const m=document.getElementById("main");m.innerHTML="";
   if(tab===0)renderList(m);
   if(tab===1)renderSchedule(m);
   if(tab===2)renderSummary(m);
   if(tab===3)renderDay(m);
   if(tab===4)renderLinks(m);
-  const oc=document.createElement("div");oc.className="octo";oc.textContent="🐙 記録は自動保存だすみ";
+  if(tab===5)renderHelp(m);
+  const oc=document.createElement("div");oc.className="octo";oc.textContent="🐙 記録は自動保存されるよ";
   m.appendChild(oc);
 }
-["tab0","tab1","tab2","tab3","tab4"].forEach((id,i)=>document.getElementById(id).onclick=()=>{tab=i;render();});
+["tab0","tab1","tab2","tab3","tab4","tab5"].forEach((id,i)=>document.getElementById(id).onclick=()=>{tab=i;render();});
 load();
 </script>
 </body>
