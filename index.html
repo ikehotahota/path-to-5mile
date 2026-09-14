@@ -30,6 +30,9 @@ nav button{flex:1;border:none;background:#fff;border:1.5px solid var(--line);col
 nav button.on{background:var(--ink);border-color:var(--ink);color:#fff}
 main{padding:10px 16px}
 .hint{font-size:13px;color:var(--sub);margin:4px 2px 10px}
+.cats{display:flex;gap:6px;margin:2px 0 12px;flex-wrap:wrap}
+.cats button{font-family:inherit;font-size:14px;font-weight:700;padding:7px 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
+.cats button.on{background:var(--violet);border-color:var(--violet);color:#fff}
 .tix{position:relative;background:var(--card);border-radius:14px;margin-bottom:12px;padding:12px 14px 12px 22px;box-shadow:0 1px 4px rgba(42,36,64,.07);overflow:hidden}
 .tix::before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;background:var(--edge,var(--violet))}
 .tix::after{content:"";position:absolute;left:4px;top:50%;width:12px;height:12px;border-radius:50%;background:var(--bg);transform:translate(-50%,-50%)}
@@ -60,6 +63,11 @@ main{padding:10px 16px}
 .btnrow{display:flex;gap:8px;margin-top:10px}
 .losebtn{flex:1;font-family:inherit;font-size:16px;font-weight:700;padding:12px 0;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
 .losebtn:active{transform:scale(.97)}
+.tix.skip{opacity:.5}
+.skipbox{margin-top:10px;background:#F1F0F5;border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:8px}
+.skipbox .sl{flex:1;font-size:16px;font-weight:700;color:var(--sub)}
+.skipbox button{font-family:inherit;font-size:14px;font-weight:700;border:1.5px solid var(--line);background:#fff;color:var(--sub);border-radius:8px;padding:6px 12px;cursor:pointer}
+.skipmini{margin-top:8px;width:100%;font-family:inherit;font-size:14px;font-weight:700;padding:8px 0;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
 .losebox{margin-top:10px;background:#F1F0F5;border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:8px}
 .losebox .ll{flex:1;font-size:16px;font-weight:700;color:var(--sub)}
 .losebox button{font-family:inherit;font-size:14px;font-weight:700;border:1.5px solid var(--line);background:#fff;color:var(--sub);border-radius:8px;padding:6px 12px;cursor:pointer}
@@ -123,6 +131,8 @@ const store={
   }
 };
 const EDITIONS=[["f","フラッシュ盤"],["i","初回限定盤"],["c","FC盤"]];
+const CATS=[["all","すべて"],["lot","🎲抽選"],["rel","💿リリイベ"],["etc","🎁その他"]];
+let cat="all";
 const RESULTS={
   sign1:{d:"2026-09-11",t:"9/11(金)15:00以降"},
   sign2:{d:"2026-09-19",t:"9/19(土)15:00以降"},
@@ -141,7 +151,8 @@ const RESULTS={
 const TARGETS={
   online:["f"],sign1:["f"],sign2:["f"],cardsign:["c"],
   gs1:["i"],gs2:["i"],gs3:["i"],bs1:["f"],bs2:["f"],
-  aku1:["f","i"],aku2:["f","i"],papa:["f","i"],xmas1:["f","i"],xmas2:["f","i"]
+  aku1:["f","i"],aku2:["f","i"],papa:["f","i"],xmas1:["f","i"],xmas2:["f","i"],
+  rel_akaike:["f","i"],rel_atc:["f","i"],rel_tokorozawa:["f","i"]
 };
 const TNOTES={
   online:"対象:フラッシュ盤(専用ページ) 1枚=1口",
@@ -160,7 +171,7 @@ const TNOTES={
   papa:"対象:フラッシュ盤 or 初回限定盤(1枚=1口・当選は1人1回)"
 };
 function editionsFor(ev){
-  const t=TARGETS[ev.id];
+  const t=TARGETS[ev.id]||(ev.cat==="rel"?["f","i"]:null);
   return EDITIONS.filter(([k])=>{
     if(ev.plan[k]||ev.conf[k])return true;      // 入力済みは常に表示
     if(t)return t.includes(k);                   // 対象盤が判明→それだけ
@@ -171,20 +182,23 @@ function editionsFor(ev){
 const DEFAULT={
   prices:{f:2420,i:6050,c:6980},
   events:[
-    {id:"online",name:"個別オンライン",part:"ー",period:"申込終了※購入した人は記録してね(当選口も)",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-11-01",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"sign1",name:"個別サイン会",part:"1部",period:"9/3-9/5",deadline:"2026-09-05",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"cardsign",name:"カードサイン会",part:"ー",period:"8/31-9/7",deadline:"2026-09-07",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"sign2",name:"個別サイン会",part:"2部",period:"9/11-9/13",deadline:"2026-09-13",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"xmas1",name:"クリスマスカード会",part:"1部",period:"9/11-9/13",deadline:"2026-09-13",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"gs1",name:"プレミアムグループサイン会",part:"1部",period:"9/19-9/21",deadline:"2026-09-21",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"xmas2",name:"クリスマスカード会",part:"2部",period:"9/18-9/23",deadline:"2026-09-23",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"gs2",name:"プレミアムグループサイン会",part:"2部",period:"9/29-10/1",deadline:"2026-10-01",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"papa",name:"パパラッチ会",part:"ー",period:"9/30-10/4",deadline:"2026-10-04",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"gs3",name:"プレミアムグループサイン会",part:"3部",period:"10/7-10/9",deadline:"2026-10-09",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"aku1",name:"個別握手会",part:"1部",period:"10/9-10/12",deadline:"2026-10-12",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"bs1",name:"Best Shot会",part:"1部",period:"10/15-10/17",deadline:"2026-10-17",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"aku2",name:"個別握手会",part:"2部",period:"10/19-10/21",deadline:"2026-10-21",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {id:"bs2",name:"Best Shot会",part:"2部",period:"10/23-10/25",deadline:"2026-10-25",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}}
+    {cat:"lot",id:"online",name:"個別オンライン",part:"ー",period:"申込終了※購入した人は記録してね(当選口も)",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-11-01",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"sign1",name:"個別サイン会",part:"1部",period:"9/3-9/5",deadline:"2026-09-05",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"cardsign",name:"カードサイン会",part:"ー",period:"8/31-9/7",deadline:"2026-09-07",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"sign2",name:"個別サイン会",part:"2部",period:"9/11-9/13",deadline:"2026-09-13",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"xmas1",name:"クリスマスカード会",part:"1部",period:"9/11-9/13",deadline:"2026-09-13",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"gs1",name:"プレミアムグループサイン会",part:"1部",period:"9/19-9/21",deadline:"2026-09-21",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"xmas2",name:"クリスマスカード会",part:"2部",period:"9/18-9/23",deadline:"2026-09-23",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"gs2",name:"プレミアムグループサイン会",part:"2部",period:"9/29-10/1",deadline:"2026-10-01",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"papa",name:"パパラッチ会",part:"ー",period:"9/30-10/4",deadline:"2026-10-04",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"gs3",name:"プレミアムグループサイン会",part:"3部",period:"10/7-10/9",deadline:"2026-10-09",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"aku1",name:"個別握手会",part:"1部",period:"10/9-10/12",deadline:"2026-10-12",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"bs1",name:"Best Shot会",part:"1部",period:"10/15-10/17",deadline:"2026-10-17",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"aku2",name:"個別握手会",part:"2部",period:"10/19-10/21",deadline:"2026-10-21",win:"rkt",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"lot",id:"bs2",name:"Best Shot会",part:"2部",period:"10/23-10/25",deadline:"2026-10-25",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"rel",id:"rel_akaike",name:"リリイベ プライムツリー赤池",part:"ー",period:"1階プライムホール／愛知県日進市赤池町箕ノ手1",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-09-26",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"rel",id:"rel_atc",name:"リリイベ ATC",part:"ー",period:"海辺のステージ（屋外）／大阪市住之江区南港北2-1-10",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-09-27",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"rel",id:"rel_tokorozawa",name:"リリイベ エミテラス所沢",part:"ー",period:"2F TOKOROZAWA e-CUBE ※詳細後日／埼玉県所沢市東住吉10-1",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-10-04",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}}
   ]
 };
 const NOTICE={date:"2026-12-18",label:"📩 参加通知ご案内予定(12/26イベント分)"};
@@ -220,7 +234,13 @@ async function load(){
       state.events.splice(Math.min(i,state.events.length),0,JSON.parse(JSON.stringify(de)));
     }
   });
-  state.events.forEach(e=>{if(e.name==="グループサイン会")e.name="プレミアムグループサイン会";});
+  state.events.forEach(e=>{
+    if(e.name==="グループサイン会")e.name="プレミアムグループサイン会";
+    if(!e.cat)e.cat=e.custom?"etc":"lot";
+    if(e.id==="rel_akaike")e.period="1階プライムホール／愛知県日進市赤池町箕ノ手1";
+    if(e.id==="rel_atc")e.period="海辺のステージ（屋外）／大阪市住之江区南港北2-1-10";
+    if(e.id==="rel_tokorozawa")e.period="2F TOKOROZAWA e-CUBE ※詳細後日／埼玉県所沢市東住吉10-1";
+  });
   const on=state.events.find(e=>e.id==="online");
   if(on&&!on.eventDate)on.eventDate="2026-11-01";
   if(on)on.period="申込終了※購入した人は記録してね(当選口も)";
@@ -250,7 +270,7 @@ function header(){
   let plan=0,conf=0;
   state.events.forEach(e=>{
     if(e.applied)conf+=amountEv(e,e.conf);
-    else plan+=amountEv(e,e.plan);
+    else if(!e.skip)plan+=amountEv(e,e.plan);
   });
   document.getElementById("mPlan").textContent=yen(plan);
   document.getElementById("mConf").textContent=yen(conf);
@@ -265,11 +285,21 @@ function stepper(val,cb){
   w.append(m,s,p);return w;
 }
 function renderList(root){
+  const chips=document.createElement("div");chips.className="cats";
+  CATS.forEach(([k,label])=>{
+    const n=k==="all"?state.events.length:state.events.filter(e=>e.cat===k).length;
+    const b=document.createElement("button");
+    b.className=cat===k?"on":"";
+    b.textContent=label+"("+n+")";
+    b.onclick=()=>{cat=k;render();};
+    chips.appendChild(b);
+  });
+  root.appendChild(chips);
   const hint=document.createElement("p");hint.className="hint";
-  hint.textContent="①予定で予算計算 → ②買ったら「応募・購入した」→ ③当たったら当選カウントUP🎉";
+  hint.textContent=cat==="rel"?"リリイベは購入枚数を記録しよう（抽選ではないので当選ボタンは出ません）":"①予定で予算計算 → ②買ったら「応募・購入した」→ ③当たったら当選🎉か残念😢を記録";
   root.appendChild(hint);
-  state.events.forEach(ev=>{
-    const c=document.createElement("div");c.className="tix "+(ev.win||"");
+  state.events.filter(e=>cat==="all"||e.cat===cat).forEach(ev=>{
+    const c=document.createElement("div");c.className="tix "+(ev.win||"")+(ev.skip?" skip":"");
     const r1=document.createElement("div");r1.className="row1";
     const nm=document.createElement("div");nm.className="name";
     nm.textContent=ev.name+(ev.part&&ev.part!=="ー"?"["+ev.part+"]":"")+(ev.wins>0?" 🎉".repeat(Math.min(ev.wins,3)):"");
@@ -313,6 +343,12 @@ function renderList(root){
       const lb=document.createElement("div");lb.className="hint";lb.textContent="名前と締切日を入力してね(締切は予定表に載るよ)";
       c.appendChild(lb);
     }
+    if(ev.cat==="rel"&&ev.eventDate){
+      const d=new Date(ev.eventDate+"T00:00:00");
+      const ha=document.createElement("div");ha.className="heldat";
+      ha.textContent="開催 "+(d.getMonth()+1)+"/"+d.getDate()+"("+["日","月","火","水","木","金","土"][d.getDay()]+")";
+      c.appendChild(ha);
+    }
     if(ev.id==="online"){
       const ha=document.createElement("div");ha.className="heldat";
       ha.style.cssText="display:flex;align-items:center;gap:8px";
@@ -336,7 +372,7 @@ function renderList(root){
       c.appendChild(ha);
     }
     // planned (budget calc) — hidden once applied to keep the card tidy? keep visible but compact
-    if(!ev.applied){
+    if(!ev.applied&&!ev.skip){
       const pc=document.createElement("div");pc.className="counts";
       const cap=document.createElement("div");cap.className="cap";cap.textContent="購入予定(予算計算)"+(TNOTES[ev.id]?" ・"+TNOTES[ev.id]:"");
       pc.appendChild(cap);
@@ -354,6 +390,15 @@ function renderList(root){
       c.appendChild(pc);
     }
     // apply button
+    if(ev.skip){
+      const sb=document.createElement("div");sb.className="skipbox";
+      const sl=document.createElement("div");sl.className="sl";
+      sl.textContent="今回は見送り";
+      const rb=document.createElement("button");rb.textContent="戻す";
+      rb.onclick=()=>{ev.skip=false;save();render();};
+      sb.append(sl,rb);c.appendChild(sb);
+      root.appendChild(c);return;
+    }
     const ab=document.createElement("button");
     ab.className="applybtn"+(ev.applied?" on":"");
     ab.textContent=ev.applied?"✔ 応募・購入済み(タップで取消)":"応募・購入した!";
@@ -378,6 +423,12 @@ function renderList(root){
       save();render();
     };
     c.appendChild(ab);
+    if(!ev.applied){
+      const sk=document.createElement("button");sk.className="skipmini";
+      sk.textContent="今回は見送る";
+      sk.onclick=()=>{ev.skip=true;save();render();toast("見送りにしたよ。予定表からも外れます");};
+      c.appendChild(sk);
+    }
     // confirmed + wins (applied only)
     if(ev.applied){
       const cc=document.createElement("div");cc.className="counts";
@@ -395,7 +446,13 @@ function renderList(root){
       ca.innerHTML="<small>確定</small>"+yen(amountEv(ev,ev.conf));
       cc.appendChild(ca);
       c.appendChild(cc);
-      if(ev.id==="online"){
+      if(ev.cat==="rel"&&ev.eventDate){
+      const d=new Date(ev.eventDate+"T00:00:00");
+      const ha=document.createElement("div");ha.className="heldat";
+      ha.textContent="開催 "+(d.getMonth()+1)+"/"+d.getDate()+"("+["日","月","火","水","木","金","土"][d.getDay()]+")";
+      c.appendChild(ha);
+    }
+    if(ev.id==="online"){
         ev.parts=ev.parts||{};
         const pb=document.createElement("div");pb.className="counts";
         const pc=document.createElement("div");pc.className="cap";
@@ -420,6 +477,8 @@ function renderList(root){
         tot.innerHTML="<small>合計</small>"+(ev.wins||0)+"口"+(ev.wins?"🎉":"");
         pb.appendChild(tot);
         c.appendChild(pb);
+      }else if(ev.cat==="rel"){
+        /* リリイベは抽選ではないので結果ボタンなし */
       }else if(ev.lost){
         const lb=document.createElement("div");lb.className="losebox";
         const ll=document.createElement("div");ll.className="ll";
@@ -467,7 +526,7 @@ function renderList(root){
   add.textContent="＋ イベントを追加(リリイベなど)";
   add.style.cssText="width:100%;font-family:inherit;font-size:16px;font-weight:700;padding:12px 0;border-radius:14px;border:2px dashed var(--violet);background:#fff;color:var(--violet)";
   add.onclick=()=>{
-    state.events.push({id:"custom"+Date.now(),name:"新イベント",part:"ー",period:"",deadline:null,win:"",applied:false,wins:0,custom:true,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}});
+    state.events.push({cat:(cat==="all"?"etc":cat),id:"custom"+Date.now(),name:"新イベント",part:"ー",period:"",deadline:null,win:"",applied:false,wins:0,custom:true,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}});
     save();render();toast("追加したよ!名前と締切日を入れてね");
   };
   root.appendChild(add);
@@ -477,12 +536,13 @@ function renderSchedule(root){
   hint.textContent="締切順。済んだものは自動でうすくなるよ";
   root.appendChild(hint);
   const today=new Date();today.setHours(0,0,0,0);
-  const items=state.events.filter(e=>e.deadline).map(e=>({
+  const items=state.events.filter(e=>e.deadline&&!e.skip).map(e=>({
     date:e.deadline,label:e.name+(e.part!=="ー"?"["+e.part+"]":"")+" 申込締切",
     cls:e.win,done:e.applied||new Date(e.deadline)<today,
     applied:e.applied,wins:e.wins,lost:e.lost
   })).concat(MILES.map(m=>({date:m.date,label:m.label,cls:"mile",done:new Date(m.date)<today})))
   .concat(state.events.filter(e=>e.id==="online"&&e.eventDate).map(e=>({date:e.eventDate,label:"💻 個別オンライン 開催日",cls:"",done:new Date(e.eventDate)<today})))
+  .concat(state.events.filter(e=>e.cat==="rel"&&e.eventDate&&!e.skip).map(e=>({date:e.eventDate,label:"💿 "+e.name,cls:"mile",done:new Date(e.eventDate)<today})))
   .concat(state.events.filter(e=>e.applied&&RESULTS[e.id]).map(e=>({date:RESULTS[e.id].d,label:"🎲 "+e.name+(e.part!=="ー"?"["+e.part+"]":"")+" 当落発表",cls:"",done:new Date(RESULTS[e.id].d)<today||e.wins>0||e.lost,wins:e.wins,lost:e.lost})))
   .concat(state.events.some(e=>e.wins>0&&RESULTS[e.id]&&e.id!=="cardsign")?[{date:NOTICE.date,label:NOTICE.label,cls:"mile",done:new Date(NOTICE.date)<today}]:[]);
   items.sort((a,b)=>a.date<b.date?-1:1);
@@ -506,11 +566,11 @@ function renderSchedule(root){
   });
 }
 function renderSummary(root){
-  let plan=0,conf=0,planN=0,confN=0,wins=0,applied=0,lost=0,waiting=0;
+  let plan=0,conf=0,planN=0,confN=0,wins=0,applied=0,lost=0,waiting=0,skipped=0;
   const byWin={ums:0,rkt:0,other:0};
   const planBy={f:0,i:0,c:0},confBy={f:0,i:0,c:0};
   state.events.forEach(e=>{
-    if(!e.applied){
+    if(!e.applied&&!e.skip){
       plan+=amountEv(e,e.plan);
       planN+=sheetsEv(e,e.plan);
       ["f","i","c"].forEach(k=>planBy[k]+=e.plan[k]*unitOf(e,k));
@@ -524,6 +584,7 @@ function renderSummary(root){
     }
     wins+=e.wins;
     if(e.applied){if(e.lost)lost++;else if(e.wins===0)waiting++;}
+    if(e.skip)skipped++;
   });
   const s1=document.createElement("div");s1.className="sumcard";
   s1.innerHTML="<h3>💰 お金の集計</h3>"
@@ -535,11 +596,21 @@ function renderSummary(root){
     +'<div class="srow"><span>　初回限定盤</span><b>'+planBy.i+"枚 / "+confBy.i+"枚</b></div>"
     +'<div class="srow"><span>　FC限定盤</span><b>'+planBy.c+"枚 / "+confBy.c+"枚</b></div>"
     +'<div class="srow"><span>　合計</span><b>'+planN+"枚 / "+confN+"枚</b></div>";
+  const byCat={lot:0,rel:0,etc:0};
+  state.events.forEach(e=>{if(e.applied)byCat[e.cat||"lot"]+=amountEv(e,e.conf);});
+  const sc=document.createElement("div");sc.className="sumcard";
+  sc.innerHTML="<h3>📂 カテゴリ別の購入金額</h3>"
+    +'<div class="srow"><span>🎲 抽選イベント</span><b>'+yen(byCat.lot)+"</b></div>"
+    +'<div class="srow"><span>💿 リリイベ</span><b>'+yen(byCat.rel)+"</b></div>"
+    +'<div class="srow"><span>🎁 その他</span><b>'+yen(byCat.etc)+"</b></div>"
+    +'<div class="srow"><span><b>合計</b></span><b>'+yen(byCat.lot+byCat.rel+byCat.etc)+"</b></div>";
+  root.appendChild(sc);
   const s2=document.createElement("div");s2.className="sumcard";
   s2.innerHTML="<h3>🎯 応募の状況</h3>"
     +'<div class="srow"><span>応募・購入済み</span><b>'+applied+"件</b></div>"
     +'<div class="srow"><span>当選口数の合計🎉</span><b>'+wins+"口</b></div>"
     +'<div class="srow"><span>結果待ち / 残念</span><b>'+waiting+"件 / "+lost+"件</b></div>"
+    +'<div class="srow"><span>見送り</span><b>'+skipped+"件</b></div>"
     +'<div class="srow"><span>ユニバ購入額</span><b>'+yen(byWin.ums)+"</b></div>"
     +'<div class="srow"><span>楽天購入額</span><b>'+yen(byWin.rkt)+"</b></div>";
   const s3=document.createElement("div");s3.className="sumcard prices";
@@ -604,7 +675,10 @@ const LINKS=[
     ["クリスマスカード贈りスマス！会","https://octpath-official.com/news/detail/2529"],
     ["パパラッチ会","https://octpath-official.com/news/detail/2531"],
     ["カードサイン会","https://octpath-official.com/news/detail/2526"],
-    ["個別オンライントーク会","https://octpath-official.com/news/detail/2497"]
+    ["個別オンライントーク会","https://octpath-official.com/news/detail/2497"],
+    ["リリースイベント まとめ","https://octpath-official.com/news/detail/2542"],
+    ["リリイベ プライムツリー赤池(9/26)","https://octpath-official.com/news/detail/2541"],
+    ["リリイベ ATC(9/27)","https://octpath-official.com/news/detail/2540"]
   ]},
   {g:"最新情報",items:[
     ["公式ニュース一覧(新イベントはここでチェック)","https://octpath-official.com/news/1/"]
@@ -762,9 +836,9 @@ function renderHelp(root){
   const tips=document.createElement("div");tips.className="sumcard";
   tips.innerHTML="<h3>💡 ちょっとしたコツ</h3><div style='font-size:15px;line-height:1.9'>"
    +"・ホーム画面に追加するとアプリのように開けます（共有ボタン→ホーム画面に追加）<br>"
-   +"・リリイベなど新しいイベントは、申込タブ下の『＋イベントを追加』から自分で足せます<br>"
+   +"・申込タブの上のチップで『🎲抽選 / 💿リリイベ / 🎁その他』を切り替えられます（合計金額は全部まとめて集計されます）<br>・新しいイベントは、そのカテゴリを選んだ状態で『＋イベントを追加』を押すと足せます<br>"
    +"・個別サイン会は2枚セットで1口なので、数字は『口数』を入れてください<br>"
-   +"・結果が出たら『当選！🎉』か『残念😢』を押すと記録が残ります（あとから取消もできます）🍀"
+   +"・結果が出たら『当選！🎉』か『残念😢』を押すと記録が残ります（あとから取消もできます）🍀<br>・申し込まないイベントは『今回は見送る』を押すと、カードが薄くなり予定表からも外れます"
    +"</div>";
   root.appendChild(tips);
 }
