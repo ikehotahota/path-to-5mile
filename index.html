@@ -131,7 +131,7 @@ const store={
   }
 };
 const EDITIONS=[["f","フラッシュ盤"],["i","初回限定盤"],["c","FC盤"]];
-const CATS=[["all","すべて"],["lot","🎲抽選"],["rel","💿リリイベ"],["etc","🎁その他"]];
+const CATS=[["all","すべて"],["lot","🎲オン・オフラ"],["rel","💿リリイベ"],["etc","🎁その他"]];
 let cat="all";
 const RESULTS={
   sign1:{d:"2026-09-11",t:"9/11(金)15:00以降"},
@@ -606,7 +606,7 @@ function renderSummary(root){
   state.events.forEach(e=>{if(e.applied)byCat[e.cat||"lot"]+=amountEv(e,e.conf);});
   const sc=document.createElement("div");sc.className="sumcard";
   sc.innerHTML="<h3>📂 カテゴリ別の購入金額</h3>"
-    +'<div class="srow"><span>🎲 抽選イベント</span><b>'+yen(byCat.lot)+"</b></div>"
+    +'<div class="srow"><span>🎲 オン・オフラ</span><b>'+yen(byCat.lot)+"</b></div>"
     +'<div class="srow"><span>💿 リリイベ</span><b>'+yen(byCat.rel)+"</b></div>"
     +'<div class="srow"><span>🎁 その他</span><b>'+yen(byCat.etc)+"</b></div>"
     +'<div class="srow"><span><b>合計</b></span><b>'+yen(byCat.lot+byCat.rel+byCat.etc)+"</b></div>";
@@ -856,7 +856,7 @@ function renderHelp(root){
   const tips=document.createElement("div");tips.className="sumcard";
   tips.innerHTML="<h3>💡 ちょっとしたコツ</h3><div style='font-size:15px;line-height:1.9'>"
    +"・ホーム画面に追加するとアプリのように開けます（共有ボタン→ホーム画面に追加）<br>"
-   +"・申込タブの上のチップで『🎲抽選 / 💿リリイベ / 🎁その他』を切り替えられます（合計金額は全部まとめて集計されます）<br>・新しいイベントは、そのカテゴリを選んだ状態で『＋イベントを追加』を押すと足せます<br>"
+   +"・申込タブの上のチップで『🎲オン・オフラ / 💿リリイベ / 🎁その他』を切り替えられます（合計金額は全部まとめて集計されます）<br>・新しいイベントは、そのカテゴリを選んだ状態で『＋イベントを追加』を押すと足せます<br>"
    +"・個別サイン会は2枚セットで1口なので、数字は『口数』を入れてください<br>"
    +"・結果が出たら『当選！🎉』か『残念😢』を押すと記録が残ります（あとから取消もできます）🍀<br>・申し込まないイベントは『今回は見送る』を押すと、カードが薄くなり予定表からも外れます"
    +"</div>";
