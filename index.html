@@ -152,7 +152,8 @@ const TARGETS={
   online:["f"],sign1:["f"],sign2:["f"],cardsign:["c"],
   gs1:["i"],gs2:["i"],gs3:["i"],bs1:["f"],bs2:["f"],
   aku1:["f","i"],aku2:["f","i"],papa:["f","i"],xmas1:["f","i"],xmas2:["f","i"],
-  rel_akaike:["f","i"],rel_atc:["f","i"],rel_tokorozawa:["f","i"]
+  rel_akaike:["f","i"],rel_atc:["f","i"],rel_tokorozawa:["f","i"],
+  rel_sendai:["f","i"],rel_tokyo1024:["f","i"],rel_kanto1114:["f","i"],rel_kanto1121:["f","i"],rel_tokyo1122:["f","i"]
 };
 const TNOTES={
   online:"対象:フラッシュ盤(専用ページ) 1枚=1口",
@@ -198,7 +199,12 @@ const DEFAULT={
     {cat:"lot",id:"bs2",name:"Best Shot会",part:"2部",period:"10/23-10/25",deadline:"2026-10-25",win:"ums",applied:false,wins:0,plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
     {cat:"rel",id:"rel_akaike",name:"リリイベ プライムツリー赤池",part:"ー",period:"1階プライムホール／愛知県日進市赤池町箕ノ手1",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-09-26",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
     {cat:"rel",id:"rel_atc",name:"リリイベ ATC",part:"ー",period:"海辺のステージ（屋外）／大阪市住之江区南港北2-1-10",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-09-27",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
-    {cat:"rel",id:"rel_tokorozawa",name:"リリイベ エミテラス所沢",part:"ー",period:"2F TOKOROZAWA e-CUBE ※詳細後日／埼玉県所沢市東住吉10-1",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-10-04",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}}
+    {cat:"rel",id:"rel_tokorozawa",name:"リリイベ エミテラス所沢",part:"ー",period:"2F TOKOROZAWA e-CUBE／埼玉県所沢市東住吉10-1",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-10-04",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"rel",id:"rel_sendai",name:"リリイベ 仙台",part:"ー",period:"仙台某所 ※詳細後日",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-10-12",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"rel",id:"rel_tokyo1024",name:"リリイベ 都内",part:"ー",period:"都内某所 ※詳細後日",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-10-24",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"rel",id:"rel_kanto1114",name:"リリイベ 関東",part:"ー",period:"関東某所 ※詳細後日",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-11-14",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"rel",id:"rel_kanto1121",name:"リリイベ 関東",part:"ー",period:"関東某所 ※詳細後日",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-11-21",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}},
+    {cat:"rel",id:"rel_tokyo1122",name:"リリイベ 都内",part:"ー",period:"都内某所 ※詳細後日",deadline:null,win:"",applied:false,wins:0,eventDate:"2026-11-22",plan:{f:0,i:0,c:0},conf:{f:0,i:0,c:0}}
   ]
 };
 const NOTICE={date:"2026-12-18",label:"📩 参加通知ご案内予定(12/26イベント分)"};
@@ -239,7 +245,7 @@ async function load(){
     if(!e.cat)e.cat=e.custom?"etc":"lot";
     if(e.id==="rel_akaike")e.period="1階プライムホール／愛知県日進市赤池町箕ノ手1";
     if(e.id==="rel_atc")e.period="海辺のステージ（屋外）／大阪市住之江区南港北2-1-10";
-    if(e.id==="rel_tokorozawa")e.period="2F TOKOROZAWA e-CUBE ※詳細後日／埼玉県所沢市東住吉10-1";
+    if(e.id==="rel_tokorozawa")e.period="2F TOKOROZAWA e-CUBE／埼玉県所沢市東住吉10-1";
   });
   const on=state.events.find(e=>e.id==="online");
   if(on&&!on.eventDate)on.eventDate="2026-11-01";
@@ -624,19 +630,31 @@ function renderSummary(root){
   });
   root.append(s1,s2,s3);
   const s4=document.createElement("div");s4.className="sumcard";
-  s4.innerHTML="<h3>💾 バックアップ</h3><p style='font-size:13px;color:var(--sub);margin-bottom:8px'>自動保存が効かないときはここからデータを退避してね。「書き出す」→全文コピーしてメモに保存。復元は貼り付けて「読み込む」</p>";
+  s4.innerHTML="<h3>💾 バックアップ</h3><p style='font-size:13px;color:var(--sub);margin-bottom:8px'>自動保存が効かないときはここからデータを退避してね。「書き出してコピー」を押すと全文がコピーされます。メモアプリに貼って保存してね。復元は貼り付けて「読み込む」</p>";
   const ta=document.createElement("textarea");
   ta.style.cssText="width:100%;height:90px;font-size:12px;border:1.5px solid var(--line);border-radius:8px;padding:8px;font-family:monospace";
   ta.placeholder="ここに書き出し/貼り付け";
   const btnrow=document.createElement("div");btnrow.style.cssText="display:flex;gap:8px;margin-top:8px";
   const ex=document.createElement("button");
   ex.style.cssText="flex:1;font-family:inherit;font-size:14px;font-weight:700;padding:9px 0;border-radius:10px;border:1.5px solid var(--violet);background:var(--violet-soft);color:var(--violet)";
-  ex.textContent="書き出す";
-  ex.onclick=()=>{
+  ex.textContent="書き出してコピー";
+  ex.onclick=async()=>{
     ta.value=JSON.stringify(state);
-    ta.select();ta.setSelectionRange(0,999999);
-    try{document.execCommand("copy");toast("コピーしたよ!メモに貼って保存してね");}
-    catch(e){toast("全選択したよ。手動でコピーしてね");}
+    ta.focus();ta.select();ta.setSelectionRange(0,999999);
+    let ok=false;
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(ta.value);ok=true;
+      }
+    }catch(e){}
+    if(!ok){try{ok=document.execCommand("copy");}catch(e){}}
+    if(ok){
+      ex.textContent="コピーしたよ✓";
+      setTimeout(()=>{ex.textContent="書き出してコピー";},2000);
+      toast("コピーしたよ!メモアプリに貼って保存してね");
+    }else{
+      toast("全選択したよ。長押し→ペーストでコピーしてね");
+    }
   };
   const im=document.createElement("button");
   im.style.cssText="flex:1;font-family:inherit;font-size:14px;font-weight:700;padding:9px 0;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--ink)";
@@ -679,7 +697,8 @@ const LINKS=[
     ["個別オンライン 開催時間変更のお知らせ(9/16)","https://octpath-official.com/news/detail/2561"],
     ["リリースイベント まとめ","https://octpath-official.com/news/detail/2542"],
     ["リリイベ プライムツリー赤池(9/26)","https://octpath-official.com/news/detail/2541"],
-    ["リリイベ ATC(9/27)","https://octpath-official.com/news/detail/2540"]
+    ["リリイベ ATC(9/27)","https://octpath-official.com/news/detail/2540"],
+    ["リリイベ エミテラス所沢(10/4)","https://octpath-official.com/news/detail/2570"]
   ]},
   {g:"最新情報",items:[
     ["公式ニュース一覧(新イベントはここでチェック)","https://octpath-official.com/news/1/"]
